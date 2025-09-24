@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "PORT=3001 node .next/standalone/server.js",
+    "prestart": "next build",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {

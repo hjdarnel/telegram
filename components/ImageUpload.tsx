@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback } from 'react';
 import { printImage } from '@/actions/print';
+import NextImage from 'next/image';
 
 export function ImageUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -163,7 +164,7 @@ export function ImageUpload() {
       {selectedImage && (
         <div className="mt-4 text-center">
           <div className="text-sm text-green-600 mb-2">✅ Image sent to printer!</div>
-          <img
+          <NextImage
             src={selectedImage}
             alt="Processed for printing"
             className="max-w-full h-auto mx-auto rounded border"

@@ -91,10 +91,10 @@ export default function TestSWF() {
       <div className="mt-8 text-sm text-gray-600">
         <h4 className="font-medium mb-2">Test Cases to Try:</h4>
         <ul className="list-disc list-inside space-y-1">
-          <li>"Hello, how are you today?" (should be non-toxic)</li>
-          <li>"This is a lovely day!" (should be non-toxic)</li>
-          <li>"I hate you and wish you were dead" (should be toxic)</li>
-          <li>"You stupid idiot" (should be toxic)</li>
+          <li>&quot;Hello, how are you today?&quot; (should be non-toxic)</li>
+          <li>&quot;This is a lovely day!&quot; (should be non-toxic)</li>
+          <li>&quot;I hate you and wish you were dead&quot; (should be toxic)</li>
+          <li>&quot;You stupid idiot&quot; (should be toxic)</li>
         </ul>
       </div>
     </div>

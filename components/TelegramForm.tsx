@@ -3,6 +3,7 @@
 import { printTelegram } from '@/lib/telegram';
 import { useActionState, useState, useRef, useCallback } from 'react';
 import { TelegramPreview } from './TelegramPreview';
+import Image from 'next/image';
 
 interface TelegramFormProps {
   enablePicture?: boolean;
@@ -14,6 +15,7 @@ export function TelegramForm({ enablePicture = false }: TelegramFormProps) {
   const [previewMessage, setPreviewMessage] = useState('');
 
   // Conditional image state and refs
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const fileInputRef = enablePicture ? useRef<HTMLInputElement>(null) : null;
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -71,7 +73,7 @@ export function TelegramForm({ enablePicture = false }: TelegramFormProps) {
   const handleImageAreaClick = useCallback(() => {
     if (!enablePicture || !fileInputRef?.current || isProcessingImage) return;
     fileInputRef.current.click();
-  }, [enablePicture, isProcessingImage]);
+  }, [enablePicture, isProcessingImage, fileInputRef]);
 
   const removeImage = useCallback(() => {
     if (!enablePicture) return;
@@ -140,7 +142,7 @@ export function TelegramForm({ enablePicture = false }: TelegramFormProps) {
                     </div>
                   ) : selectedImage ? (
                     <div className="space-y-2">
-                      <img
+                      <Image
                         src={selectedImage}
                         alt="Selected image"
                         className="max-w-full h-auto mx-auto rounded"

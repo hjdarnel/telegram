@@ -1,5 +1,7 @@
 'use client';
 
+import Image from "next/image";
+
 interface TelegramPreviewProps {
   name: string;
   message: string;
@@ -46,7 +48,7 @@ export function TelegramPreview({ name, message, image }: TelegramPreviewProps) 
       {image && (
         <div className="border-t border-dashed border-gray-400 pt-4 mb-6">
           <div className="mb-2"><strong>IMAGE:</strong></div>
-          <img
+          <Image
             src={image}
             alt="Telegram image"
             className="max-w-full h-auto mx-auto rounded border"
