@@ -134,6 +134,7 @@ ${name}: ${message}
 
   return {
     body: `Printed message: ${message}${imageData ? ' (with image)' : ''}`,
+    message,
     name
   };
 }

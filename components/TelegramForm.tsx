@@ -10,7 +10,7 @@ interface TelegramFormProps {
 }
 
 export function TelegramForm({ enablePicture = false }: TelegramFormProps) {
-  const [state, formAction] = useActionState(printTelegram, { body: '', name: '' });
+  const [state, formAction] = useActionState(printTelegram, { body: '', name: '', message: '' });
   const [previewName, setPreviewName] = useState('');
   const [previewMessage, setPreviewMessage] = useState('');
 
@@ -102,7 +102,7 @@ export function TelegramForm({ enablePicture = false }: TelegramFormProps) {
               id="message"
               rows={5}
               maxLength={500}
-              defaultValue=""
+              defaultValue={(state.message as string) || ''}
               onChange={(e) => setPreviewMessage(e.target.value)}
             />
             
