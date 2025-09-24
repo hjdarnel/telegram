@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 // import { checkSWF } from './sfw';
 import { client, encoder } from './printer';
 import { revalidatePath } from 'next/cache';
+import { loadImage } from 'canvas';
 
 let count = 0;
 
@@ -29,6 +30,7 @@ export async function printTelegram(_prevState: any, data: FormData) {
   rateLimit.set(ip, Date.now());
   const message = (data.get('message') || '').slice(0, 10000) as string;
   const name = (data.get('name') || '').slice(0, 30) as string;
+  const imageData = data.get('image') as string | null;
 
   console.log(`
 Printing message:
@@ -70,7 +72,36 @@ ${name}: ${message}
     .align('left')
     .line(`${message}`)
     .newline()
-    .newline()
+    .newline();
+
+  // Handle optional image printing
+  if (imageData) {
+    try {
+      const image = await loadImage(imageData);
+      encodedMessage
+        .align('center')
+        .line('='.repeat(40))
+        .newline()
+        .newline()
+        .line('IMAGE:')
+        .newline()
+        .image(image, image.width, image.height, 'floydsteinberg')
+        .newline()
+        .newline();
+    } catch (error) {
+      console.error('Error processing image for printing:', error);
+      encodedMessage
+        .align('center')
+        .line('='.repeat(40))
+        .newline()
+        .newline()
+        .line('IMAGE: [Error processing image]')
+        .newline()
+        .newline();
+    }
+  }
+
+  encodedMessage
     .align('center')
     .line('='.repeat(40))
     .newline()
@@ -89,13 +120,14 @@ ${name}: ${message}
     .newline()
     .newline()
     .newline()
-    .cut('full')
-    .encode();
-  client?.write(encodedMessage);
+    .cut('full');
+  
+  const finalEncodedMessage = encodedMessage.encode();
+  client?.write(finalEncodedMessage);
   count++;
 
   return {
-    body: `Printed message: ${message}`,
+    body: `Printed message: ${message}${imageData ? ' (with image)' : ''}`,
     name
   };
 }
