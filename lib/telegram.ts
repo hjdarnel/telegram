@@ -1,0 +1,101 @@
+'use server';
+import { headers } from 'next/headers';
+// import { checkSWF } from './sfw';
+import { client, encoder } from './printer';
+import { revalidatePath } from 'next/cache';
+
+let count = 0;
+
+const rateLimit = new Map<string | null, number>();
+
+export async function printTelegram(_prevState: any, data: FormData) {
+  const ip =
+    (await headers()).get('x-forwarded-for') ||
+    (await headers()).get('x-real-ip');
+  
+  const lastRequest = rateLimit.get(ip);
+  console.log({
+    ip, lastRequest, lastRequestIso: lastRequest ? new Date(lastRequest).toLocaleString('en-US', { timeZone: 'America/Chicago' }) : 'N/A',
+    nowIso: new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })
+  });
+  
+  if (lastRequest && Date.now() - lastRequest < 5000) {
+    console.log('Rate limited');
+    return {
+      body: 'Rate limited'
+    };
+  }
+
+  rateLimit.set(ip, Date.now());
+  const message = (data.get('message') || '').slice(0, 10000) as string;
+  const name = (data.get('name') || '').slice(0, 30) as string;
+
+  console.log(`
+Printing message:
+${name}: ${message}
+`);
+  // let result = await checkSWF(message as string);
+  // const printedMessage =
+  //   result.score > 0.85
+  //     ? `REDACTED! Toxic score of ${Math.round(result.score * 100)}%`
+  //     : message;
+  // if (result.score > 0.85) {
+  //   console.log('💀', result.score, message);
+  //   return {
+  //     body: printedMessage
+  //   };
+  // }
+  const encodedMessage = encoder
+    .initialize()
+    .bold()
+    .align('center')
+    .height(2)
+    .width(2)
+    .line('TELEGRAM')
+    .width(1)
+    .height(1)
+    .newline()
+    .newline()
+    .align('left')
+    .line(`SENT: ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })}`)
+    .newline()
+    .line(`FROM: ${name?.toUpperCase() || 'ANONYMOUS'}`)
+    .newline()
+    .newline()
+    .align('center')
+    .line('='.repeat(40))
+    .newline()
+    .newline()
+    .line(`MESSAGE:`)
+    .align('left')
+    .line(`${message}`)
+    .newline()
+    .newline()
+    .align('center')
+    .line('='.repeat(40))
+    .newline()
+    .newline()
+    .height(2)
+    .width(2)
+    .line('TELEGRAM RECEIVED')
+    .height(1)
+    .width(1)
+    .newline()
+    .line(`ID: ${Date.now().toString().slice(-8)}`)
+    .newline()
+    .newline()
+    .newline()
+    .newline()
+    .newline()
+    .newline()
+    .newline()
+    .cut('full')
+    .encode();
+  client?.write(encodedMessage);
+  count++;
+
+  return {
+    body: `Printed message: ${message}`,
+    name
+  };
+}
