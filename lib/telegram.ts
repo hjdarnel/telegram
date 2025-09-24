@@ -1,6 +1,6 @@
 'use server';
 import { headers } from 'next/headers';
-// import { checkSWF } from './sfw';
+import { checkSWF } from './sfw';
 import { client, encoder } from './printer';
 import { revalidatePath } from 'next/cache';
 import { loadImage } from 'canvas';
@@ -36,17 +36,23 @@ export async function printTelegram(_prevState: any, data: FormData) {
 Printing message:
 ${name}: ${message}
 `);
-  // let result = await checkSWF(message as string);
-  // const printedMessage =
-  //   result.score > 0.85
-  //     ? `REDACTED! Toxic score of ${Math.round(result.score * 100)}%`
-  //     : message;
-  // if (result.score > 0.85) {
-  //   console.log('💀', result.score, message);
-  //   return {
-  //     body: printedMessage
-  //   };
-  // }
+  
+  // Check for toxic content
+  const result = await checkSWF(message as string);
+  const isToxic = result && result.length > 0 && 
+    (result[0].label === 'toxic') && 
+    result[0].score > 0.85;
+  
+  const printedMessage = isToxic
+    ? `REDACTED! Toxic score of ${Math.round(result[0].score * 100)}%`
+    : message;
+    
+  if (isToxic) {
+    console.log('💀', result[0].score, message);
+    return {
+      body: printedMessage
+    };
+  }
   const encodedMessage = encoder
     .initialize()
     .bold()

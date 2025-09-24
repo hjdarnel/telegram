@@ -5,8 +5,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Thermal',
-  description: 'A Thermal Printer run by JS'
+  title: 'Telegram',
+  description: 'A Telegram service, sending via thermal printer, run by JS'
 };
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="https://fav.farm/🧾" />
+        <link rel="icon" href="https://fav.farm/📤" />
       </head>
       <body className={inter.className}>
         <div className="grid gap-2">{children}</div>
