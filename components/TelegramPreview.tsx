@@ -20,9 +20,9 @@ export function TelegramPreview({ name, message }: TelegramPreviewProps) {
     hour12: true 
   });
 
-  if (!name && !message) {
-    return null;
-  }
+  // if (!name && !message) {
+  //   return null;
+  // }
 
   return (
     <div className="bg-white text-black font-mono text-xs p-4 py-8 max-w-xs mx-auto shadow-lg border border-gray-300 ">

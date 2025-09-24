@@ -6,8 +6,8 @@ import { TelegramPreview } from './TelegramPreview';
 
 export function TelegramForm() {
   const [state, formAction] = useActionState(printTelegram, { body: '', name: '' });
-  const [previewName, setPreviewName] = useState('Alex Johnson');
-  const [previewMessage, setPreviewMessage] = useState('Hey there! Hope you\'re having a wonderful day. I just wanted to send you a quick message to say hello and let you know I\'m thinking of you. These telegram receipts are pretty cool, aren\'t they? Take care and talk soon!');
+  const [previewName, setPreviewName] = useState('');
+  const [previewMessage, setPreviewMessage] = useState('');
 
   return (
     <div className="space-y-4">
@@ -21,7 +21,7 @@ export function TelegramForm() {
               name="name"
               required
               maxLength={25}
-              defaultValue={(state.name as string) || 'Alex Johnson'}
+              defaultValue={(state.name as string) || ''}
               onChange={(e) => setPreviewName(e.target.value)}
             />
             <textarea
@@ -31,7 +31,7 @@ export function TelegramForm() {
               id="message"
               rows={5}
               maxLength={500}
-              defaultValue="Hey there! Hope you're having a wonderful day. I just wanted to send you a quick message to say hello and let you know I'm thinking of you. These telegram receipts are pretty cool, aren't they? Take care and talk soon!"
+              defaultValue=""
               onChange={(e) => setPreviewMessage(e.target.value)}
             />
             <button 
