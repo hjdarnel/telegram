@@ -20,7 +20,7 @@ export async function printTelegram(_prevState: any, data: FormData) {
     nowIso: new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })
   });
   
-  if (lastRequest && Date.now() - lastRequest < 5000) {
+  if (lastRequest && Date.now() - lastRequest < 15000) {
     console.log('Rate limited');
     return {
       body: 'Rate limited'
