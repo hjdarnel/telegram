@@ -101,7 +101,7 @@ export function TelegramForm({ enablePicture = false }: TelegramFormProps) {
               name="message"
               id="message"
               rows={5}
-              maxLength={500}
+              maxLength={10000}
               defaultValue={(state.message as string) || ''}
               onChange={(e) => setPreviewMessage(e.target.value)}
             />
@@ -204,7 +204,7 @@ export function TelegramForm({ enablePicture = false }: TelegramFormProps) {
           </form>
           
           {state.body && (
-            <div className="mt-4 p-3 bg-green-100 border border-green-300 rounded text-green-800">
+            <div className="mt-4 p-3 bg-green-100 border border-green-300 rounded text-green-800 break-all overflow-wrap-anywhere overflow-hidden max-w-full whitespace-pre-wrap">
               {state.body}
             </div>
           )}
