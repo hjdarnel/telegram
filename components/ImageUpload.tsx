@@ -168,8 +168,7 @@ export function ImageUpload() {
 							/>
 						</svg>
 						<div className="text-sm md:text-base text-gray-600">
-							<span className="font-medium">Click to upload</span> or drag and
-							drop
+							<span className="font-medium">Click to take picture, upload</span> or drag and drop
 						</div>
 						<div className="text-xs md:text-sm text-gray-500">
 							Any image type (PNG, JPG, GIF, etc.)

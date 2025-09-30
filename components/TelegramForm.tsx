@@ -196,8 +196,7 @@ export function TelegramForm() {
 												/>
 											</svg>
 											<div className="text-sm text-gray-600">
-												<span className="font-medium">Click to upload</span> or
-												drag and drop
+												<span className="font-medium">Click to take picture, upload</span> or drag and drop
 											</div>
 											<div className="text-xs text-gray-500">
 												Optional image (PNG, JPG, GIF, etc.)
