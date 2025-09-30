@@ -1,13 +1,9 @@
 import { TelegramForm } from "./TelegramForm";
 
-interface TelegramProps {
-	enablePicture?: boolean;
-}
-
-export default function Telegram({ enablePicture = false }: TelegramProps) {
+export default function Telegram() {
 	return (
 		<div>
-			<TelegramForm enablePicture={enablePicture} />
+			<TelegramForm />
 		</div>
 	);
 }

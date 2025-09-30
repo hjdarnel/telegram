@@ -9,7 +9,7 @@ export default function Home() {
 				Type something and it will print on my thermal printer.
 			</p>
 			<div className="max-w-4xl mx-auto">
-				<Telegram enablePicture={false} />
+				<Telegram />
 			</div>
 		</main>
 	);

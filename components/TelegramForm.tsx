@@ -1,15 +1,11 @@
 "use client";
 
 import { printTelegram } from "@/lib/telegram";
-import Image from "next/image";
 import { useActionState, useCallback, useRef, useState } from "react";
 import { TelegramPreview } from "./TelegramPreview";
 
-interface TelegramFormProps {
-	enablePicture?: boolean;
-}
-
-export function TelegramForm({ enablePicture = false }: TelegramFormProps) {
+export function TelegramForm() {
+	const enablePicture = process.env.NEXT_PUBLIC_ENABLE_PICTURE === "true";
 	const [state, formAction] = useActionState(printTelegram, {
 		body: "",
 		name: "",
@@ -127,7 +123,7 @@ export function TelegramForm({ enablePicture = false }: TelegramFormProps) {
 							onChange={(e) => setPreviewMessage(e.target.value)}
 						/>
 
-						{true && (
+						{enablePicture && (
 							<div className="space-y-2">
 								<label className="block text-sm font-medium text-gray-700">
 									Optional Image
@@ -166,11 +162,11 @@ export function TelegramForm({ enablePicture = false }: TelegramFormProps) {
 										</div>
 									) : selectedImage ? (
 										<div className="space-y-2">
-											<Image
+											{ /* eslint-disable-next-line @next/next/no-img-element*/ }
+											<img
 												src={selectedImage}
 												alt="Selected image"
 												className="max-w-full h-auto mx-auto rounded"
-												style={{ maxHeight: "120px" }}
 											/>
 											<button
 												type="button"

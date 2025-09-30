@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 interface TelegramPreviewProps {
 	name: string;
 	message: string;
@@ -60,11 +58,11 @@ export function TelegramPreview({
 					<div className="mb-2">
 						<strong>IMAGE:</strong>
 					</div>
-					<Image
+					{ /* eslint-disable-next-line @next/next/no-img-element*/ }
+					<img
 						src={image}
 						alt="Telegram image"
 						className="max-w-full h-auto mx-auto rounded border"
-						style={{ maxHeight: "150px" }}
 					/>
 				</div>
 			)}
