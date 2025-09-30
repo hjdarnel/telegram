@@ -1,88 +1,57 @@
-import net from 'node:net';
-import EscPosEncoder from 'esc-pos-encoder';
+import EscPosEncoder from "esc-pos-encoder";
 
-// ESCPOS command to print "Hello, World!"
-const printData = Buffer.from([
-  0x1b,
-  0x40, // Initialize printer
-  0x1b,
-  0x21,
-  0x30, // Select character size
-  0x48,
-  0x65,
-  0x6c,
-  0x6c,
-  0x6f,
-  0x2c,
-  0x20,
-  0x57,
-  0x6f,
-  0x72,
-  0x6c,
-  0x64,
-  0x21,
-  0x0a // "Hello, World!\n"
-]);
+const THERMAL_PRINTER_URL =
+	process.env.PRINTER_URL || "http://192.168.1.212:4000";
 
-const PORT = 9100; // Most printers use port 9100
-const HOST = '192.168.1.232'; // The IP address of the printer, I got this by holding the feed button on the printer while turning it on
+/**
+ * Sends ESC/POS encoded buffer to the thermal printer server over HTTP
+ * @param buffer - The ESC/POS encoded buffer to send
+ * @returns Promise that resolves when the print job is sent
+ */
+export async function sendToPrinter(
+	buffer: Uint8Array,
+): Promise<{ success: boolean; error?: string }> {
+	if (process.env.NO_PRINTER === "true") {
+		console.log("[🧾 THERMAL] NO_PRINTER is set, skipping print");
+		return { success: true };
+	}
 
-const printerClientSingleton = () => {
-  if (process.env.NO_PRINTER) {
-    console.log('NO_PRINTER is set, not creating printer client');
-    return;
-  }
-  console.log('Creating new socket...');
-  return new net.Socket();
-};
+	try {
+		const base64Buffer = Buffer.from(buffer).toString("base64");
 
-// This singleton pattern is used to ensure that the client is only created once and reused across hot reloads in Next.js
-export const client =
-  globalThis.printerClientGlobal ?? printerClientSingleton();
-globalThis.printerClientGlobal = client;
+		console.log("[🧾 THERMAL] Sending print job to", THERMAL_PRINTER_URL);
 
-if (!globalThis.printerConnected) {
-  console.log('[🧾 THERMAL] Connecting to printer for the first time');
-  client?.connect(PORT, HOST, () => {
-    globalThis.printerConnected = true;
-    console.log('[🧾 THERMAL] Connected to printer');
-  });
+		const response = await fetch(`${THERMAL_PRINTER_URL}/data`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				buffer: base64Buffer,
+			}),
+		});
+
+		if (!response.ok) {
+			const errorData = await response
+				.json()
+				.catch(() => ({ error: "Unknown error" }));
+			console.error("[🧾 THERMAL] Print job failed:", errorData);
+			return {
+				success: false,
+				error: errorData.error || "Failed to send print job",
+			};
+		}
+
+		const result = await response.json();
+		console.log("[🧾 THERMAL] Print job sent successfully:", result);
+		return { success: true };
+	} catch (error) {
+		console.error("[🧾 THERMAL] Error sending to printer:", error);
+		return {
+			success: false,
+			error: error instanceof Error ? error.message : "Unknown error",
+		};
+	}
 }
-
-client?.on('data', (data) => {
-  console.log('[🧾 THERMAL] Received:', data.toString('hex'));
-});
-
-client?.on('error', (err) => {
-  console.error('[🧾 THERMAL] Error connecting to printer:', err);
-});
-
-client?.on('close', () => {
-  console.log('[🧾 THERMAL] Disconnected from printer');
-});
-
-const socketEvents = [
-  'close',
-  'connectionAttempt',
-  'connectionAttemptFailed',
-  'connectionAttemptTimeout',
-  'drain',
-  'end',
-  'lookup',
-  'connect',
-  'ready',
-  'timeout'
-];
-
-socketEvents.forEach((event) => {
-  client?.on(event, (data) => {
-    console.log('[🧾 THERMAL] Event:', event);
-  });
-});
-
-declare const globalThis: {
-  printerClientGlobal: ReturnType<typeof printerClientSingleton>;
-  printerConnected: boolean;
-} & typeof global;
 
 export const encoder = new EscPosEncoder();

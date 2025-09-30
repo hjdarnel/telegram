@@ -1,13 +1,13 @@
-import { TelegramForm } from './TelegramForm';
+import { TelegramForm } from "./TelegramForm";
 
 interface TelegramProps {
-  enablePicture?: boolean;
+	enablePicture?: boolean;
 }
 
 export default function Telegram({ enablePicture = false }: TelegramProps) {
-  return (
-    <div>
-      <TelegramForm enablePicture={enablePicture} />
-    </div>
-  );
+	return (
+		<div>
+			<TelegramForm enablePicture={enablePicture} />
+		</div>
+	);
 }

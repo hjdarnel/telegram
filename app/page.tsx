@@ -1,14 +1,16 @@
-import React from 'react';
-import Telegram from '@/components/Telegram';
+import Telegram from "@/components/Telegram";
+import React from "react";
 
 export default function Home() {
-  return (
-    <main className="text-center p-4 md:p-[50px]">
-      <h2 className="text-xl md:text-2xl">Send me a telegram!</h2>
-      <p className="text-sm md:text-base mb-8">Type something and it will print on my thermal printer.</p>
-      <div className="max-w-4xl mx-auto">
-          <Telegram enablePicture={false} />
-      </div>
-    </main>
-  );
+	return (
+		<main className="text-center p-4 md:p-[50px]">
+			<h2 className="text-xl md:text-2xl">Send me a telegram!</h2>
+			<p className="text-sm md:text-base mb-8">
+				Type something and it will print on my thermal printer.
+			</p>
+			<div className="max-w-4xl mx-auto">
+				<Telegram enablePicture={false} />
+			</div>
+		</main>
+	);
 }
