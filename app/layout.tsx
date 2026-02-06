@@ -5,8 +5,13 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-	title: "Telegram",
+	title: "Telegram - Darnell.club",
 	description: "A Telegram service, sending via thermal printer, run by JS",
+	openGraph: {
+		title: "Telegram - Darnell.club",
+		description: "Send me a telegram!",
+		type: "website",
+	}
 };
 
 export default function RootLayout({
