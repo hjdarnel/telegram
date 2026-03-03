@@ -1,22 +1,69 @@
 "use server";
+import path from "path";
 import { loadImage } from "canvas";
+import { mkdir, writeFile } from "fs/promises";
 import { headers } from "next/headers";
 import { encoder, sendToPrinter } from "./printer";
 import { checkSWF } from "./sfw";
 
 const rateLimit = new Map<string | null, number>();
 
-async function notifyHomeAssistant(name: string) {
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+
+async function cacheImage(imageData: string, baseUrl: string): Promise<string | null> {
+
+	try {
+		// Extract base64 data from data URL
+		const matches = imageData.match(/^data:image\/(\w+);base64,(.+)$/);
+		if (!matches) {
+			console.warn("[📷 CACHE] Invalid image data URL");
+			return null;
+		}
+
+		const buffer = Buffer.from(matches[2], "base64");
+
+		if (buffer.length > MAX_IMAGE_SIZE) {
+			console.warn(`[📷 CACHE] Image too large (${(buffer.length / 1024 / 1024).toFixed(1)}MB), skipping`);
+			return null;
+		}
+
+		const ext = matches[1] === "jpeg" ? "jpg" : matches[1];
+		const dir = path.join(process.cwd(), ".cache", "telegram");
+		await mkdir(dir, { recursive: true });
+
+		const filename = `latest.${ext}`;
+		await writeFile(path.join(dir, filename), buffer);
+		console.log(`[📷 CACHE] Cached image (${(buffer.length / 1024).toFixed(1)}KB)`);
+
+		return `${baseUrl}/api/telegram-image`;
+	} catch (error) {
+		console.error("[📷 CACHE] Error caching image:", error);
+		return null;
+	}
+}
+
+async function notifyHomeAssistant(name: string, imageUrl?: string | null) {
 	const hassUrl = process.env.HASS_URL;
 	const hassToken = process.env.HASS_TOKEN;
 	const hassNotifyEntity = process.env.HASS_NOTIFY_ENTITY;
 
 	if (!hassUrl || !hassToken || !hassNotifyEntity) {
-		console.warn("[🏠 HASS] Missing HASS_URL, HASS_TOKEN, or HASS_MOBILE_APP, skipping notification");
+		console.warn("[🏠 HASS] Missing HASS_URL, HASS_TOKEN, or HASS_NOTIFY_ENTITY, skipping notification");
 		return;
 	}
 
 	try {
+		const notificationData: Record<string, unknown> = {
+			push: {
+				"interruption-level": "time-sensitive",
+			},
+			group: "telegram-notifications",
+		};
+
+		if (imageUrl) {
+			notificationData.image = imageUrl;
+		}
+
 		const response = await fetch(
 			`${hassUrl}/api/services/notify/${hassNotifyEntity}`,
 			{
@@ -28,6 +75,7 @@ async function notifyHomeAssistant(name: string) {
 				body: JSON.stringify({
 					message: `Received a telegram from ${name || "Anonymous"}`,
 					title: "📬 New Telegram Arrived!",
+					data: notificationData,
 				}),
 			}
 		);
@@ -189,7 +237,17 @@ ${name}: ${message}
 		};
 	}
 
-	await notifyHomeAssistant(name);
+	// Cache image and notify Home Assistant
+	let imageUrl: string | null = null;
+	if (imageData) {
+		const appUrl = process.env.APP_URL;
+		if (appUrl) {
+			imageUrl = await cacheImage(imageData, appUrl);
+		} else {
+			console.warn("[📷 CACHE] APP_URL not set, skipping image in notification");
+		}
+	}
+	await notifyHomeAssistant(name, imageUrl);
 
 	return {
 		body: `Printed message: ${message}${imageData ? " (with image)" : ""}`,
