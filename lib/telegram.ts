@@ -4,8 +4,43 @@ import { headers } from "next/headers";
 import { encoder, sendToPrinter } from "./printer";
 import { checkSWF } from "./sfw";
 
-
 const rateLimit = new Map<string | null, number>();
+
+async function notifyHomeAssistant(name: string) {
+	const hassUrl = process.env.HASS_URL;
+	const hassToken = process.env.HASS_TOKEN;
+	const hassNotifyEntity = process.env.HASS_NOTIFY_ENTITY;
+
+	if (!hassUrl || !hassToken || !hassNotifyEntity) {
+		console.warn("[🏠 HASS] Missing HASS_URL, HASS_TOKEN, or HASS_MOBILE_APP, skipping notification");
+		return;
+	}
+
+	try {
+		const response = await fetch(
+			`${hassUrl}/api/services/notify/${hassNotifyEntity}`,
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${hassToken}`,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					message: `Received a telegram from ${name || "Anonymous"}`,
+					title: "📬 New Telegram Arrived!",
+				}),
+			}
+		);
+
+		if (!response.ok) {
+			console.error("[🏠 HASS] Notification failed:", response.status, await response.text());
+		} else {
+			console.log("[🏠 HASS] Notification sent successfully");
+		}
+	} catch (error) {
+		console.error("[🏠 HASS] Error sending notification:", error);
+	}
+}
 
 export async function printTelegram(_prevState: any, data: FormData) {
 	const ip =
@@ -153,6 +188,8 @@ ${name}: ${message}
 			error: true,
 		};
 	}
+
+	await notifyHomeAssistant(name);
 
 	return {
 		body: `Printed message: ${message}${imageData ? " (with image)" : ""}`,
