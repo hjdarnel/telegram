@@ -20,9 +20,11 @@ export async function testPrinter(formData: FormData) {
 export async function printImage(base64String: string) {
 	console.log("printing image");
 	const image = await loadImage(base64String);
+	const adjustedWidth = Math.floor(image.width / 8) * 8;
+	const adjustedHeight = Math.floor(image.height / 8) * 8;
 	const result = encoder
 		.initialize()
-		.image(image, image.width, image.height, "floydsteinberg")
+		.image(image, adjustedWidth, adjustedHeight, "floydsteinberg")
 		.encode();
 	await sendToPrinter(result);
 	await cutPaper();

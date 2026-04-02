@@ -175,6 +175,8 @@ ${name}: ${message}
 	if (imageData) {
 		try {
 			const image = await loadImage(imageData);
+			const adjustedWidth = Math.floor(image.width / 8) * 8;
+			const adjustedHeight = Math.floor(image.height / 8) * 8;
 			encodedMessage
 				.align("center")
 				.line("=".repeat(40))
@@ -182,7 +184,7 @@ ${name}: ${message}
 				.newline()
 				.line("IMAGE:")
 				.newline()
-				.image(image, image.width, image.height, "floydsteinberg")
+				.image(image, adjustedWidth, adjustedHeight, "floydsteinberg")
 				.newline()
 				.newline();
 		} catch (error) {
