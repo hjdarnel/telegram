@@ -8,6 +8,19 @@ import { checkSWF } from "./sfw";
 
 const rateLimit = new Map<string | null, number>();
 
+function sanitize(text: string): string {
+	return text
+		.replace(/[\u2018\u2019\u2032]/g, "'")
+		.replace(/[\u201C\u201D\u2033]/g, '"')
+		.replace(/[\u2013\u2014\u2015]/g, "-")
+		.replace(/\u2026/g, "...")
+		.replace(/\u2022/g, "*")
+		.replace(/[\u00AB\u00BB]/g, '"')
+		.replace(/[\u2039\u203A]/g, "'")
+		.replace(/\u00A0/g, " ")
+		.replace(/[\u200B\u200C\u200D\uFEFF]/g, "");
+}
+
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
 async function cacheImage(imageData: string, baseUrl: string): Promise<string | null> {
@@ -115,7 +128,7 @@ export async function printTelegram(_prevState: any, data: FormData) {
 	}
 
 	rateLimit.set(ip, Date.now());
-	const message = (data.get("message") || "").slice(0, 10000) as string;
+	const message = sanitize(((data.get("message") || "") as string).slice(0, 10000));
 	const name = (data.get("name") || "").slice(0, 30) as string;
 	const imageData = data.get("image") as string | null;
 
