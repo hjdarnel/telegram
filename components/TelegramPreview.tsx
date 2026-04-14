@@ -25,12 +25,8 @@ export function TelegramPreview({
 		hour12: true,
 	});
 
-	// if (!name && !message) {
-	//   return null;
-	// }
-
 	return (
-		<div className="bg-white text-black font-mono text-xs p-4 py-6 max-w-xs mx-auto shadow-lg border border-gray-300 ">
+		<div className="bg-white text-black font-mono text-xs p-4 py-6 w-[58ch] mx-auto shadow-lg border border-gray-300">
 			<div className="text-center mb-6">
 				<h3 className="font-bold text-lg tracking-wider">TELEGRAM</h3>
 			</div>
@@ -45,10 +41,10 @@ export function TelegramPreview({
 			</div>
 
 			<div className="border-t border-dashed border-gray-400 pt-4 mb-6">
-				<div className="mb-1">
+				<div className="mb-1 text-center">
 					<strong>MESSAGE:</strong>
 				</div>
-				<div className="whitespace-pre-wrap break-words">
+				<div className="whitespace-pre-wrap break-words text-left">
 					{message || "(No message)"}
 				</div>
 			</div>
